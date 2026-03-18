@@ -5,6 +5,22 @@ use screencapturekit::stream::delegate_trait::StreamCallbacks;
 
 use crate::audio_toolkit::{audio::FrameResampler, constants};
 
+/// Check if Screen Recording permission is granted (non-prompting).
+pub fn is_screen_recording_permitted() -> bool {
+    unsafe { CGPreflightScreenCaptureAccess() }
+}
+
+/// Prompt the user to grant Screen Recording permission.
+/// Returns `true` if access was granted.
+pub fn request_screen_recording_permission() -> bool {
+    unsafe { CGRequestScreenCaptureAccess() }
+}
+
+extern "C" {
+    fn CGPreflightScreenCaptureAccess() -> bool;
+    fn CGRequestScreenCaptureAccess() -> bool;
+}
+
 enum Cmd {
     Start,
     Stop(mpsc::Sender<Vec<f32>>),
@@ -34,6 +50,13 @@ impl SystemAudioCapture {
 
         let worker = std::thread::spawn(move || {
             let init_result = (|| -> Result<(SCStream, mpsc::Receiver<Vec<f32>>), String> {
+                if !is_screen_recording_permitted() {
+                    return Err(
+                        "Screen Recording permission denied. Grant access in System Settings."
+                            .to_string(),
+                    );
+                }
+
                 let content = SCShareableContent::get()
                     .map_err(|e| format!("Failed to get shareable content: {e}"))?;
 
@@ -102,10 +125,13 @@ impl SystemAudioCapture {
             }
             Ok(Err(msg)) => {
                 let _ = worker.join();
-                Err(Box::new(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    msg,
-                )))
+                let kind = if msg.contains("permission denied") || msg.contains("Permission denied")
+                {
+                    std::io::ErrorKind::PermissionDenied
+                } else {
+                    std::io::ErrorKind::Other
+                };
+                Err(Box::new(std::io::Error::new(kind, msg)))
             }
             Err(e) => {
                 let _ = worker.join();
