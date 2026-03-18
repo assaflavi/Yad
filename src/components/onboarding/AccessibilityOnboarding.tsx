@@ -380,9 +380,17 @@ const AccessibilityOnboarding: React.FC<AccessibilityOnboardingProps> = ({
                     {t("onboarding.permissions.granted")}
                   </div>
                 ) : permissions.accessibility === "waiting" ? (
-                  <div className="flex items-center gap-2 text-text/50 text-sm">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    {t("onboarding.permissions.waiting")}
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2 text-text/50 text-sm">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {t("onboarding.permissions.waiting")}
+                    </div>
+                    <button
+                      onClick={completeOnboarding}
+                      className="text-xs text-text/40 hover:text-text/70 transition-colors text-left"
+                    >
+                      {t("onboarding.permissions.continueAnyway")}
+                    </button>
                   </div>
                 ) : (
                   <button

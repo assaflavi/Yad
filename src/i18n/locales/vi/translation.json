@@ -108,6 +108,7 @@
       "grant": "Cấp quyền",
       "granted": "Đã cấp",
       "waiting": "Đang chờ...",
+      "continueAnyway": "Tôi đã cấp quyền — tiếp tục",
       "allGranted": "Hoàn tất!",
       "errors": {
         "checkFailed": "Không thể kiểm tra quyền. Vui lòng thử lại.",

@@ -108,6 +108,7 @@
       "grant": "Grant Permission",
       "granted": "Granted",
       "waiting": "Waiting...",
+      "continueAnyway": "I've already granted it — continue",
       "allGranted": "All set!",
       "errors": {
         "checkFailed": "Failed to check permissions. Please try again.",

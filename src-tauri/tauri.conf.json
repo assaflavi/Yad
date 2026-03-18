@@ -4,7 +4,7 @@
   "version": "0.7.11",
   "identifier": "com.lavi.yad",
   "build": {
-    "beforeDevCommand": "./scripts/dev.sh",
+    "beforeDevCommand": "bun run dev",
     "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "bun run build",
     "frontendDist": "../dist"

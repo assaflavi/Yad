@@ -108,6 +108,7 @@
       "grant": "Conceder Permissão",
       "granted": "Concedido",
       "waiting": "Aguardando...",
+      "continueAnyway": "Já concedi — continuar",
       "allGranted": "Tudo pronto!",
       "errors": {
         "checkFailed": "Erro ao verificar permissões. Por favor, tente novamente.",

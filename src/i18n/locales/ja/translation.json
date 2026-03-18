@@ -108,6 +108,7 @@
       "grant": "権限を許可",
       "granted": "許可済み",
       "waiting": "待機中...",
+      "continueAnyway": "すでに許可しました — 続行",
       "allGranted": "準備完了！",
       "errors": {
         "checkFailed": "権限の確認に失敗しました。もう一度お試しください。",
