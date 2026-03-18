@@ -1,5 +1,5 @@
 {
-  description = "Handy - A free, open source, and extensible speech-to-text application that works completely offline";
+  description = "Yad — macOS meeting transcription & summarization";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -43,8 +43,8 @@
           lib = pkgs.lib;
         in
         {
-          handy = pkgs.rustPlatform.buildRustPackage {
-            pname = "handy";
+          yad = pkgs.rustPlatform.buildRustPackage {
+            pname = "yad";
             inherit version;
             src = self;
 
@@ -187,15 +187,15 @@
             '';
 
             meta = {
-              description = "A free, open source, and extensible speech-to-text application that works completely offline";
-              homepage = "https://github.com/cjpais/Handy";
+              description = "Yad — macOS meeting transcription & summarization";
+              homepage = "https://github.com/assaflavi/Yad";
               license = lib.licenses.mit;
-              mainProgram = "handy";
+              mainProgram = "yad";
               platforms = supportedSystems;
             };
           };
 
-          default = self.packages.${system}.handy;
+          default = self.packages.${system}.yad;
         }
       );
 
@@ -204,7 +204,7 @@
         { lib, pkgs, ... }:
         {
           imports = [ ./nix/module.nix ];
-          programs.handy.package = lib.mkDefault self.packages.${pkgs.stdenv.hostPlatform.system}.handy;
+          programs.yad.package = lib.mkDefault self.packages.${pkgs.stdenv.hostPlatform.system}.yad;
         };
 
       # Home-manager module for per-user service
@@ -212,7 +212,7 @@
         { lib, pkgs, ... }:
         {
           imports = [ ./nix/hm-module.nix ];
-          services.handy.package = lib.mkDefault self.packages.${pkgs.stdenv.hostPlatform.system}.handy;
+          services.yad.package = lib.mkDefault self.packages.${pkgs.stdenv.hostPlatform.system}.yad;
         };
 
       # Development shell for building from source
@@ -259,7 +259,7 @@
            ] else []);
 
            shellHook = ''
-             echo "Handy development environment (${system})"
+             echo "Yad development environment (${system})"
              bun install
              echo "Run 'bun run tauri dev' to start"
            '' + (if isLinux then ''

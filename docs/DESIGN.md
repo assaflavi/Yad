@@ -32,21 +32,21 @@ System Audio (ScreenCaptureKit) + Microphone (CPAL)
 ### Audio Capture
 
 - **System audio** via `screencapturekit` Rust crate (macOS 13+)
-- **Microphone** via CPAL (existing Handy infrastructure)
+- **Microphone** via CPAL (inherited from Handy)
 - **Mixed single stream** for MVP — both sources merged before transcription
 - Audio streamed to disk in chunks (temp WAV segments) for long meetings
 - No audio stored after transcription — privacy-first
 
 ### Transcription
 
-- Local Whisper inference via `transcribe-rs` (existing Handy infrastructure)
+- Local Whisper inference via `transcribe-rs` (inherited from Handy)
 - Full model catalog preserved: Whisper Small/Medium/Turbo/Large, Parakeet V2/V3, Moonshine, SenseVoice, GigaAM, Canary
 - Any source language supported (model-dependent)
 - Single-pass transcription of full concatenated audio after recording stops
 
 ### Summarization
 
-- Cloud LLM post-processing (existing Handy infrastructure)
+- Cloud LLM post-processing (inherited from Handy)
 - User configures provider (OpenAI, Anthropic, custom OpenAI-compatible), API key, and model
 - Summary always produced in the organization's documentation language (configurable, defaults to English)
 - Customizable Markdown templates with `%%placeholders%%`

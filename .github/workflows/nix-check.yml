@@ -78,7 +78,7 @@ jobs:
         if: steps.bun-check.outputs.outdated != 'true'
         id: eval
         run: |
-          if ! nix eval .#packages.x86_64-linux.handy.drvPath 2>eval_err.log; then
+          if ! nix eval .#packages.x86_64-linux.yad.drvPath 2>eval_err.log; then
             echo "failed=true" >> "$GITHUB_OUTPUT"
             cat eval_err.log
           fi
@@ -108,6 +108,6 @@ jobs:
       # sandbox issues, compilation failures) that flake eval alone misses.
       # Only runs when nix packaging files change (~25 min with cold cache).
       # Always runs on workflow_dispatch (manual trigger).
-      - name: Build handy
+      - name: Build yad
         if: steps.bun-check.outputs.outdated != 'true' && steps.eval.outputs.failed != 'true' && (steps.nix-files.outputs.changed == 'true' || github.event_name == 'workflow_dispatch')
-        run: nix build .#handy -L --show-trace
+        run: nix build .#yad -L --show-trace
