@@ -1,5 +1,6 @@
 // Re-export all audio components
 mod device;
+pub mod mixer;
 mod recorder;
 mod resampler;
 #[cfg(target_os = "macos")]
