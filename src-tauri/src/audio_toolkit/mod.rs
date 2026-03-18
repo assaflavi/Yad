@@ -4,6 +4,8 @@ pub mod text;
 pub mod utils;
 pub mod vad;
 
+#[cfg(target_os = "macos")]
+pub use audio::SystemAudioCapture;
 pub use audio::{
     is_microphone_access_denied, list_input_devices, list_output_devices, save_wav_file,
     AudioRecorder, CpalDeviceInfo,

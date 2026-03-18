@@ -1,1 +1,2 @@
 pub const WHISPER_SAMPLE_RATE: u32 = 16000;
+pub const SCK_SAMPLE_RATE: u32 = 48000;
