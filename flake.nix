@@ -24,6 +24,8 @@
       supportedSystems = [
         "x86_64-linux"
         "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
       ];
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
       # Read version from Cargo.toml
@@ -215,67 +217,69 @@
 
       # Development shell for building from source
       devShells = forAllSystems (
-        system:
-        let
-          pkgs = import nixpkgs {
-            inherit system;
-          };
-        in
-        {
-          default = pkgs.mkShell {
-            buildInputs = with pkgs; [
-              # Rust
-              rustc
-              cargo
-              rust-analyzer
-              clippy
-              # Frontend
-              nodejs
-              bun
-              # Tauri CLI
-              cargo-tauri
-              # Native deps
-              pkg-config
-              openssl
-              alsa-lib
-              libsoup_3
-              webkitgtk_4_1
-              gtk3
-              gtk-layer-shell
-              glib
-              libxtst
-              libevdev
-              llvmPackages.libclang
-              cmake
-              vulkan-headers
-              vulkan-loader
-              shaderc
-              libappindicator
-            ];
+       system:
+       let
+         pkgs = import nixpkgs {
+           inherit system;
+         };
+         isDarwin = pkgs.stdenv.isDarwin;
+         isLinux = pkgs.stdenv.isLinux;
+       in
+       {
+         default = pkgs.mkShell {
+           buildInputs = with pkgs; [
+             # Rust
+             rustc
+             cargo
+             rust-analyzer
+             clippy
+             # Frontend
+             nodejs
+             bun
+             # Tauri CLI
+             cargo-tauri
+             # Native deps
+             pkg-config
+             cmake
+             llvmPackages.libclang
+           ] ++ (if isLinux then [
+             openssl
+             alsa-lib
+             libsoup_3
+             webkitgtk_4_1
+             gtk3
+             gtk-layer-shell
+             glib
+             libxtst
+             libevdev
+             vulkan-headers
+             vulkan-loader
+             shaderc
+             libappindicator
+           ] else []);
 
-            LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
-            LD_LIBRARY_PATH = "${pkgs.lib.makeLibraryPath [ pkgs.libappindicator ]}";
-            GST_PLUGIN_SYSTEM_PATH_1_0 = "${pkgs.lib.makeSearchPathOutput "lib" "lib/gstreamer-1.0" (
-              with pkgs.gst_all_1;
-              [
-                gstreamer
-                gst-plugins-base
-                gst-plugins-good
-                gst-plugins-bad
-                gst-plugins-ugly
-              ]
-            )}";
+           LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
 
-            # Same as wrapGAppsHook4
-            XDG_DATA_DIRS = "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}:${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}:${pkgs.hicolor-icon-theme}/share";
-
-            shellHook = ''
-              echo "Handy development environment"
-              bun install
-              echo "Run 'bun run tauri dev' to start"
-            '';
-          };
-        }
+           shellHook = ''
+             echo "Handy development environment (${system})"
+             bun install
+             echo "Run 'bun run tauri dev' to start"
+           '' + (if isLinux then ''
+             export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath [ pkgs.libappindicator ]}:$LD_LIBRARY_PATH"
+             export GST_PLUGIN_SYSTEM_PATH_1_0="${pkgs.lib.makeSearchPathOutput "lib" "lib/gstreamer-1.0" (
+               with pkgs.gst_all_1;
+               [
+                 gstreamer
+                 gst-plugins-base
+                 gst-plugins-good
+                 gst-plugins-bad
+                 gst-plugins-ugly
+               ]
+             )}"
+             export XDG_DATA_DIRS="${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}:${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}:${pkgs.hicolor-icon-theme}/share"
+           '' else "");
+         };
+       }
       );
     };
 }
