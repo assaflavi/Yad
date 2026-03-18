@@ -4,7 +4,7 @@
 
 Yad captures both sides of a remote meeting, transcribes locally using Whisper, and produces structured Markdown summaries via a cloud LLM. Forked from [Handy](https://github.com/cjpais/handy).
 
-The name references the *yad*, the pointer used to follow text when reading Torah — a metaphor for following along a conversation and producing a written record.
+The name references the _yad_, the pointer used to follow text when reading Torah — a metaphor for following along a conversation and producing a written record.
 
 > ⚠️ **Early development** — Yad is under active development and not yet ready for general use.
 
@@ -48,4 +48,3 @@ See [docs/DESIGN.md](docs/DESIGN.md) for the full design specification.
 ## License
 
 [MIT](LICENSE)
-

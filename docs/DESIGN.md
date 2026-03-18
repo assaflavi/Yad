@@ -2,7 +2,7 @@
 
 **Yad** (יד — Hebrew for "hand") is a macOS desktop app for meeting transcription and summarization. Forked from [Handy](https://github.com/cjpais/handy), it captures both sides of a remote meeting, transcribes locally using Whisper, and produces structured Markdown summaries via a cloud LLM.
 
-The name references the *yad*, the pointer used to follow text when reading Torah — a metaphor for an app that follows along a conversation and produces a written record. It's also a nod to the upstream project, Handy.
+The name references the _yad_, the pointer used to follow text when reading Torah — a metaphor for an app that follows along a conversation and produces a written record. It's also a nod to the upstream project, Handy.
 
 ## Core Pipeline
 
@@ -30,6 +30,7 @@ System Audio (ScreenCaptureKit) + Microphone (CPAL)
 ## MVP Scope
 
 ### Audio Capture
+
 - **System audio** via `screencapturekit` Rust crate (macOS 13+)
 - **Microphone** via CPAL (existing Handy infrastructure)
 - **Mixed single stream** for MVP — both sources merged before transcription
@@ -37,19 +38,23 @@ System Audio (ScreenCaptureKit) + Microphone (CPAL)
 - No audio stored after transcription — privacy-first
 
 ### Transcription
+
 - Local Whisper inference via `transcribe-rs` (existing Handy infrastructure)
 - Full model catalog preserved: Whisper Small/Medium/Turbo/Large, Parakeet V2/V3, Moonshine, SenseVoice, GigaAM, Canary
 - Any source language supported (model-dependent)
 - Single-pass transcription of full concatenated audio after recording stops
 
 ### Summarization
+
 - Cloud LLM post-processing (existing Handy infrastructure)
 - User configures provider (OpenAI, Anthropic, custom OpenAI-compatible), API key, and model
 - Summary always produced in the organization's documentation language (configurable, defaults to English)
 - Customizable Markdown templates with `%%placeholders%%`
 
 ### Template Engine
+
 Available placeholders:
+
 - `%%title%%` — user-provided or default timestamp
 - `%%date%%` — meeting date (formatted per locale)
 - `%%duration%%` — recording duration
@@ -63,18 +68,23 @@ Available placeholders:
 Default title: human-readable lexicographical timestamp of meeting start (e.g., `2026-03-18 14.30`).
 
 Default template:
+
 ```markdown
 # %%title%%
+
 **Date:** %%date%%
 **Duration:** %%duration%%
 
 ## Summary
+
 %%summary%%
 
 ## Key Decisions
+
 %%decisions%%
 
 ## Action Items
+
 %%action_items%%
 
 ---
@@ -90,15 +100,18 @@ Default template:
 Filename pattern: `%%date%%-%%title%%.md` (configurable).
 
 ### Meeting Lifecycle
+
 States: `Idle → Recording → Paused → Recording → ... → Stopped → TitlePrompt → Processing → Done`
 
 Controls:
+
 - **Start:** Global hotkey or tray menu
 - **Pause/Resume:** Tray menu or hotkey
 - **Stop:** Tray menu or hotkey → prompts for title
 - **Cancel:** Discard session
 
 ### UX
+
 - **Tray-only** during meetings — no notepad, no overlay
 - Tray icon states: idle, recording (pulsing), processing
 - Tray menu shows recording duration and controls during a session
@@ -107,6 +120,7 @@ Controls:
 - **Processing indicator:** "Transcribing..." → "Summarizing..." → "Done ✓ — Open"
 
 ### Onboarding (first launch)
+
 1. Grant Screen Recording permission (ScreenCaptureKit)
 2. Grant Microphone permission
 3. Download a Whisper model
@@ -114,39 +128,41 @@ Controls:
 5. Set output folder
 
 ### Output
+
 - Save `.md` files to user-configured folder (e.g., `~/Meeting Notes/` or Obsidian vault)
 - Optionally copy to clipboard
 - Transcript + summary preserved in the same file
 - No audio stored
 
 ### Permissions (macOS)
+
 - Screen Recording (for ScreenCaptureKit audio capture)
 - Microphone access
 - `NSScreenCaptureUsageDescription` and `NSMicrophoneUsageDescription` in Info.plist
 
 ## Reuse from Handy
 
-| Component | Reuse |
-|---|---|
-| Tauri shell, build system, single-instance | ✅ As-is |
-| Model manager (download, load, unload) | ✅ As-is |
-| Whisper/transcribe-rs integration | ✅ As-is |
-| LLM post-processing pipeline | ✅ Adapt prompts for meeting summarization |
-| CPAL audio recording (mic) | ✅ As-is |
-| VAD (Silero) | ✅ For silence detection, not filtering |
-| Tray menu infrastructure | ✅ Reshape for meeting controls |
-| Global hotkey system | ✅ Remap for start/pause/stop |
-| Settings persistence | ✅ Extend schema |
+| Component                                  | Reuse                                      |
+| ------------------------------------------ | ------------------------------------------ |
+| Tauri shell, build system, single-instance | ✅ As-is                                   |
+| Model manager (download, load, unload)     | ✅ As-is                                   |
+| Whisper/transcribe-rs integration          | ✅ As-is                                   |
+| LLM post-processing pipeline               | ✅ Adapt prompts for meeting summarization |
+| CPAL audio recording (mic)                 | ✅ As-is                                   |
+| VAD (Silero)                               | ✅ For silence detection, not filtering    |
+| Tray menu infrastructure                   | ✅ Reshape for meeting controls            |
+| Global hotkey system                       | ✅ Remap for start/pause/stop              |
+| Settings persistence                       | ✅ Extend schema                           |
 
 ## New Components
 
-| Component | Description |
-|---|---|
-| `SystemAudioCapture` | ScreenCaptureKit integration via `screencapturekit` crate |
-| `MeetingManager` | Session lifecycle (start/pause/resume/stop/title/process) |
-| `TemplateEngine` | Markdown templates with `%%placeholders%%` |
-| `MeetingStore` | Persists transcript + summary as `.md` files |
-| Frontend | Title dialog, settings, meeting history (simplified from Handy) |
+| Component            | Description                                                     |
+| -------------------- | --------------------------------------------------------------- |
+| `SystemAudioCapture` | ScreenCaptureKit integration via `screencapturekit` crate       |
+| `MeetingManager`     | Session lifecycle (start/pause/resume/stop/title/process)       |
+| `TemplateEngine`     | Markdown templates with `%%placeholders%%`                      |
+| `MeetingStore`       | Persists transcript + summary as `.md` files                    |
+| Frontend             | Title dialog, settings, meeting history (simplified from Handy) |
 
 ## Roadmap (Post-MVP)
 
@@ -160,18 +176,18 @@ Controls:
 
 ## Technology Stack
 
-| Layer | Technology |
-|---|---|
-| App framework | Tauri 2.x (Rust backend + WebView frontend) |
-| Frontend | React + TypeScript + Tailwind CSS |
-| Audio (mic) | CPAL (CoreAudio on macOS) |
-| Audio (system) | `screencapturekit` Rust crate |
-| Resampling | rubato |
-| VAD | Silero VAD (ONNX) |
-| Transcription | whisper-rs, transcribe-rs (local inference) |
-| Summarization | OpenAI / Anthropic / custom provider APIs |
-| Storage | tauri-plugin-store (settings), filesystem (.md files) |
-| Packaging | Tauri bundler (macOS .dmg) |
+| Layer          | Technology                                            |
+| -------------- | ----------------------------------------------------- |
+| App framework  | Tauri 2.x (Rust backend + WebView frontend)           |
+| Frontend       | React + TypeScript + Tailwind CSS                     |
+| Audio (mic)    | CPAL (CoreAudio on macOS)                             |
+| Audio (system) | `screencapturekit` Rust crate                         |
+| Resampling     | rubato                                                |
+| VAD            | Silero VAD (ONNX)                                     |
+| Transcription  | whisper-rs, transcribe-rs (local inference)           |
+| Summarization  | OpenAI / Anthropic / custom provider APIs             |
+| Storage        | tauri-plugin-store (settings), filesystem (.md files) |
+| Packaging      | Tauri bundler (macOS .dmg)                            |
 
 ## Key Design Decisions
 
