@@ -238,11 +238,11 @@
              bun
              # Tauri CLI
              cargo-tauri
-             # Native deps
+           ] ++ (if isLinux then [
+             # Native deps (Linux only — on macOS these come from Xcode)
              pkg-config
              cmake
              llvmPackages.libclang
-           ] ++ (if isLinux then [
              openssl
              alsa-lib
              libsoup_3
@@ -258,13 +258,12 @@
              libappindicator
            ] else []);
 
-           LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
-
            shellHook = ''
              echo "Handy development environment (${system})"
              bun install
              echo "Run 'bun run tauri dev' to start"
            '' + (if isLinux then ''
+             export LIBCLANG_PATH="${pkgs.llvmPackages.libclang.lib}/lib"
              export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath [ pkgs.libappindicator ]}:$LD_LIBRARY_PATH"
              export GST_PLUGIN_SYSTEM_PATH_1_0="${pkgs.lib.makeSearchPathOutput "lib" "lib/gstreamer-1.0" (
                with pkgs.gst_all_1;
@@ -277,7 +276,10 @@
                ]
              )}"
              export XDG_DATA_DIRS="${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}:${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}:${pkgs.hicolor-icon-theme}/share"
-           '' else "");
+           '' else ''
+             # On macOS, use system Xcode SDK — Nix's Apple SDK is too old for Swift compilation
+             export SDKROOT="$(xcrun --show-sdk-path)"
+           '');
          };
        }
       );
