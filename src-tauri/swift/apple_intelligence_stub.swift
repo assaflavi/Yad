@@ -20,26 +20,26 @@ public func processTextWithSystemPrompt(
     let responsePtr = ResponsePointer.allocate(capacity: 1)
     // Initialize with safe defaults
     responsePtr.initialize(to: AppleLLMResponse(response: nil, success: 0, error_message: nil))
-    
+
     let msg = "Apple Intelligence is not available in this build (SDK requirement not met)."
-    
+
     // Duplicate the string for the C caller to own
     responsePtr.pointee.error_message = strdup(msg)
-    
+
     return responsePtr
 }
 
 @_cdecl("free_apple_llm_response")
 public func freeAppleLLMResponse(_ response: UnsafeMutablePointer<AppleLLMResponse>?) {
     guard let response = response else { return }
-    
+
     if let responseStr = response.pointee.response {
         free(UnsafeMutablePointer(mutating: responseStr))
     }
-    
+
     if let errorStr = response.pointee.error_message {
         free(UnsafeMutablePointer(mutating: errorStr))
     }
-    
+
     response.deallocate()
 }

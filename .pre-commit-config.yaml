@@ -1,0 +1,29 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ["--maxkb=1000"]
+
+  - repo: local
+    hooks:
+      - id: prettier
+        name: prettier
+        entry: bun run format:frontend
+        language: system
+        pass_filenames: false
+
+      - id: eslint
+        name: eslint
+        entry: bun run lint
+        language: system
+        pass_filenames: false
+
+      - id: cargo-fmt
+        name: cargo fmt
+        entry: sh -c 'cd src-tauri && rustup run stable cargo fmt --check'
+        language: system
+        pass_filenames: false
